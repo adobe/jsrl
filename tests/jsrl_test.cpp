@@ -1567,6 +1567,41 @@ TEST(Jsrl,ParseFunction) {
     EXPECT_EQ( string_encode(json_ss), string_encode(json_sp) );
 }
 
+TEST(Jsrl,ParseFunctionStringView) {
+    std::string_view parse_sv = R"JSON({"key":"value","array":[1,2,3]})JSON";
+    Json json_sv = Json::parse( parse_sv );
+    EXPECT_TRUE( json_sv.is_object() );
+    EXPECT_EQ( string("value"), json_sv["key"].as_string() );
+    EXPECT_TRUE( json_sv["array"].is_array() );
+    EXPECT_EQ( 3u, json_sv["array"].size() );
+}
+
+TEST(Jsrl,ParseFunctionStringViewEmpty) {
+    std::string_view parse_sv = R"JSON({})JSON";
+    Json json_sv = Json::parse( parse_sv );
+    EXPECT_TRUE( json_sv.is_object() );
+    EXPECT_EQ( 0u, json_sv.as_object().size() );
+}
+
+TEST(Jsrl,ParseFunctionStringViewComplex) {
+    std::string_view parse_sv = R"JSON({"bool":true,"null":null,"num":42.5,"str":"test"})JSON";
+    Json json_sv = Json::parse( parse_sv );
+    EXPECT_TRUE( json_sv.is_object() );
+    EXPECT_TRUE( json_sv["bool"].as_bool() );
+    EXPECT_TRUE( json_sv["null"].is_null() );
+    EXPECT_EQ( 42.5L, json_sv["num"].as_number_float() );
+    EXPECT_EQ( string("test"), json_sv["str"].as_string() );
+}
+
+TEST(Jsrl,ParseFunctionStringViewSubstring) {
+    string full_json = R"JSON({"a":1}{"b":2})JSON";
+    std::string_view first_part(full_json.data(), 7);  // {"a":1} is 7 chars
+    Json json_sv = Json::parse( first_part );
+    EXPECT_TRUE( json_sv.is_object() );
+    EXPECT_EQ( 1, json_sv["a"].as_number_sint() );
+    EXPECT_FALSE( json_sv.has_key("b") );
+}
+
 struct ComparatorTester {
     void add( unsigned lineno, bool is_new, string const &json_value ) {
         Json new_value = Json::parse(json_value);

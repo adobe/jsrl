@@ -1634,8 +1634,8 @@ namespace jsrl {
         jsrl_streambuf sbuf( start, finish );
         return context_parse( sbuf );
     }
-    Json Json::parse( string const &str ) {
-        char const *const s = str.c_str();
+    Json Json::parse( string_view str ) {
+        char const *const s = str.data();
         return parse( s, s+str.size() );
     }
 

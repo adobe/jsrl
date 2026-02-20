@@ -860,10 +860,10 @@ namespace jsrl {
          */
         static
         Json parse( char const *start, char const *finish );
-        /*! @brief  Parse the given string into Json.
+        /*! @brief  Parse the given string or string_view into Json.
          */
         static
-        Json parse( string const &str );
+        Json parse( string_view str );
         /*! @brief  Parse JSON from a streambuf object.
          */
         static
