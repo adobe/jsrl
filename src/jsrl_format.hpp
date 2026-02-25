@@ -16,7 +16,6 @@
 #include "jsrlpp.hpp"
 #include "jsrl_general_number.hpp"
 
-#include <format>
 #include <sstream>
 
 /*! @file jsrl_format.hpp
@@ -33,6 +32,8 @@
 #  error "jsrl_format.hpp requires C++20 or later"
 #elif !__has_include(<format>)
 #  error "jsrl_format.hpp requires a standard library that provides <format>"
+#else
+#include <format>
 #endif
 
 namespace std {
@@ -48,8 +49,8 @@ namespace std {
      */
     template <>
     struct formatter<jsrl::Json> : formatter<string> {
-        template <typename _FormatContext>
-        auto format(jsrl::Json const& val, _FormatContext& ctx) const {
+        template <typename FormatContext>
+        auto format(jsrl::Json const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
             return formatter<string>::format(oss.str(), ctx);
@@ -62,8 +63,8 @@ namespace std {
      */
     template <>
     struct formatter<jsrl::Json::OptionedWrite> : formatter<string> {
-        template <typename _FormatContext>
-        auto format(jsrl::Json::OptionedWrite const& val, _FormatContext& ctx) const {
+        template <typename FormatContext>
+        auto format(jsrl::Json::OptionedWrite const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
             return formatter<string>::format(oss.str(), ctx);
@@ -76,8 +77,8 @@ namespace std {
      */
     template <>
     struct formatter<jsrl::JsonPrettyPrint> : formatter<string> {
-        template <typename _FormatContext>
-        auto format(jsrl::JsonPrettyPrint const& val, _FormatContext& ctx) const {
+        template <typename FormatContext>
+        auto format(jsrl::JsonPrettyPrint const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
             return formatter<string>::format(oss.str(), ctx);
@@ -90,8 +91,8 @@ namespace std {
      */
     template <>
     struct formatter<jsrl::BoundJsonPrettyPrint> : formatter<string> {
-        template <typename _FormatContext>
-        auto format(jsrl::BoundJsonPrettyPrint const& val, _FormatContext& ctx) const {
+        template <typename FormatContext>
+        auto format(jsrl::BoundJsonPrettyPrint const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
             return formatter<string>::format(oss.str(), ctx);
@@ -104,8 +105,8 @@ namespace std {
      */
     template <>
     struct formatter<jsrl::Json::Error> : formatter<string> {
-        template <typename _FormatContext>
-        auto format(jsrl::Json::Error const& val, _FormatContext& ctx) const {
+        template <typename FormatContext>
+        auto format(jsrl::Json::Error const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
             return formatter<string>::format(oss.str(), ctx);
@@ -118,8 +119,8 @@ namespace std {
      */
     template <>
     struct formatter<jsrl::GeneralNumber> : formatter<string> {
-        template <typename _FormatContext>
-        auto format(jsrl::GeneralNumber const& val, _FormatContext& ctx) const {
+        template <typename FormatContext>
+        auto format(jsrl::GeneralNumber const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
             return formatter<string>::format(oss.str(), ctx);
