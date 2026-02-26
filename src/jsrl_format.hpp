@@ -16,7 +16,6 @@
 #include "jsrlpp.hpp"
 #include "jsrl_general_number.hpp"
 
-#include <format>
 #include <sstream>
 
 /*! @file jsrl_format.hpp
@@ -29,8 +28,12 @@
  *  Requires C++20 or later for std::format support.
  */
 
-#ifndef __cpp_lib_format
-#error std::format not supported by the current C++ version or library.
+#if __cplusplus < 202002L
+#  error "jsrl_format.hpp requires C++20 or later"
+#elif !__has_include(<format>)
+#  error "jsrl_format.hpp requires a standard library that provides <format>"
+#else
+#include <format>
 #endif
 
 namespace std {
@@ -39,17 +42,18 @@ namespace std {
      *
      *  Formats Json values using their operator<< implementation,
      *  producing compact JSON output.
+     *
+     *  Inheriting from formatter<string> satisfies the std::formattable concept
+     *  as required by libc++'s consteval format-string validation in
+     *  std::basic_format_string.
      */
     template <>
-    struct formatter<jsrl::Json> {
-        constexpr auto parse(format_parse_context& ctx) {
-            return ctx.begin();
-        }
-
-        auto format(jsrl::Json const& val, format_context& ctx) const {
+    struct formatter<jsrl::Json> : formatter<string> {
+        template <typename FormatContext>
+        auto format(jsrl::Json const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
-            return std::format_to(ctx.out(), "{}", oss.str());
+            return formatter<string>::format(oss.str(), ctx);
         }
     };
 
@@ -58,15 +62,12 @@ namespace std {
      *  Formats Json values with custom encoding options (loose floats, UTF-8 handling, etc.).
      */
     template <>
-    struct formatter<jsrl::Json::OptionedWrite> {
-        constexpr auto parse(format_parse_context& ctx) {
-            return ctx.begin();
-        }
-
-        auto format(jsrl::Json::OptionedWrite const& val, format_context& ctx) const {
+    struct formatter<jsrl::Json::OptionedWrite> : formatter<string> {
+        template <typename FormatContext>
+        auto format(jsrl::Json::OptionedWrite const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
-            return std::format_to(ctx.out(), "{}", oss.str());
+            return formatter<string>::format(oss.str(), ctx);
         }
     };
 
@@ -75,15 +76,12 @@ namespace std {
      *  Formats Json values with pretty-printing (indentation, newlines).
      */
     template <>
-    struct formatter<jsrl::JsonPrettyPrint> {
-        constexpr auto parse(format_parse_context& ctx) {
-            return ctx.begin();
-        }
-
-        auto format(jsrl::JsonPrettyPrint const& val, format_context& ctx) const {
+    struct formatter<jsrl::JsonPrettyPrint> : formatter<string> {
+        template <typename FormatContext>
+        auto format(jsrl::JsonPrettyPrint const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
-            return std::format_to(ctx.out(), "{}", oss.str());
+            return formatter<string>::format(oss.str(), ctx);
         }
     };
 
@@ -92,15 +90,12 @@ namespace std {
      *  Formats Json values bound to a specific pretty-print configuration.
      */
     template <>
-    struct formatter<jsrl::BoundJsonPrettyPrint> {
-        constexpr auto parse(format_parse_context& ctx) {
-            return ctx.begin();
-        }
-
-        auto format(jsrl::BoundJsonPrettyPrint const& val, format_context& ctx) const {
+    struct formatter<jsrl::BoundJsonPrettyPrint> : formatter<string> {
+        template <typename FormatContext>
+        auto format(jsrl::BoundJsonPrettyPrint const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
-            return std::format_to(ctx.out(), "{}", oss.str());
+            return formatter<string>::format(oss.str(), ctx);
         }
     };
 
@@ -109,15 +104,12 @@ namespace std {
      *  Formats Json error objects with their error tag and message.
      */
     template <>
-    struct formatter<jsrl::Json::Error> {
-        constexpr auto parse(format_parse_context& ctx) {
-            return ctx.begin();
-        }
-
-        auto format(jsrl::Json::Error const& val, format_context& ctx) const {
+    struct formatter<jsrl::Json::Error> : formatter<string> {
+        template <typename FormatContext>
+        auto format(jsrl::Json::Error const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
-            return std::format_to(ctx.out(), "{}", oss.str());
+            return formatter<string>::format(oss.str(), ctx);
         }
     };
 
@@ -126,15 +118,12 @@ namespace std {
      *  Formats GeneralNumber values using their operator<< implementation.
      */
     template <>
-    struct formatter<jsrl::GeneralNumber> {
-        constexpr auto parse(format_parse_context& ctx) {
-            return ctx.begin();
-        }
-
-        auto format(jsrl::GeneralNumber const& val, format_context& ctx) const {
+    struct formatter<jsrl::GeneralNumber> : formatter<string> {
+        template <typename FormatContext>
+        auto format(jsrl::GeneralNumber const& val, FormatContext& ctx) const {
             std::ostringstream oss;
             oss << val;
-            return std::format_to(ctx.out(), "{}", oss.str());
+            return formatter<string>::format(oss.str(), ctx);
         }
     };
 
