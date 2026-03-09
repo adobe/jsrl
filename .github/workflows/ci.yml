@@ -1,0 +1,181 @@
+name: CI
+
+on:
+  # Only run on workflow_dispatch (manual trigger)
+  workflow_dispatch:
+  # Pull requests from forks require approval by default
+  pull_request_target:
+    types: [labeled]
+
+# Note: For pull requests from forks, workflows require manual approval
+# from a maintainer before running. This is a GitHub security feature.
+
+jobs:
+  # Only run if the PR has the "safe to test" label or it's manually triggered
+  check-approval:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request_target' && contains(github.event.pull_request.labels.*.name, 'safe to test'))
+    steps:
+      - name: Approval check passed
+        run: echo "Proceeding with CI"
+
+  build-and-test:
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-C++${{ matrix.cxx_standard }}
+    runs-on: ${{ matrix.os }}
+    needs: check-approval
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        compiler: [gcc, clang, msvc]
+        cxx_standard: [17, 20]
+        exclude:
+          # Only use MSVC on Windows
+          - os: ubuntu-latest
+            compiler: msvc
+          - os: macos-latest
+            compiler: msvc
+          # Only use GCC on Ubuntu
+          - os: macos-latest
+            compiler: gcc
+          - os: windows-latest
+            compiler: gcc
+          # Use native compilers
+          - os: windows-latest
+            compiler: clang
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        # For pull_request_target, checkout the PR code
+        ref: ${{ github.event.pull_request.head.sha || github.ref }}
+
+    - name: Set up GCC
+      if: matrix.compiler == 'gcc'
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 11
+
+    - name: Set up Clang
+      if: matrix.compiler == 'clang' && matrix.os == 'ubuntu-latest'
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: 14
+
+    - name: Configure CMake (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_CXX_STANDARD=${{ matrix.cxx_standard }} \
+          -DJSRL_BUILD_TESTS=ON
+
+    - name: Configure CMake (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cmake -B build `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_CXX_STANDARD=${{ matrix.cxx_standard }} `
+          -DJSRL_BUILD_TESTS=ON
+
+    - name: Build
+      run: cmake --build build --config Release -j
+
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure --build-config Release -j
+
+    - name: Install
+      run: cmake --install build --prefix install
+
+  build-ubuntu-sanitizers:
+    name: Ubuntu-Clang-Sanitizers
+    runs-on: ubuntu-latest
+    needs: check-approval
+
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address, undefined, thread]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha || github.ref }}
+
+    - name: Set up Clang
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: 14
+
+    - name: Configure CMake with sanitizers
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_CXX_STANDARD=17 \
+          -DCMAKE_CXX_FLAGS="-fsanitize=${{ matrix.sanitizer }} -fno-omit-frame-pointer" \
+          -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=${{ matrix.sanitizer }}" \
+          -DJSRL_BUILD_TESTS=ON
+
+    - name: Build
+      run: cmake --build build -j
+
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure -j
+      env:
+        ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+        UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        TSAN_OPTIONS: halt_on_error=1
+
+  build-coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    needs: check-approval
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha || github.ref }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lcov
+
+    - name: Configure CMake with coverage
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_CXX_STANDARD=17 \
+          -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
+          -DCMAKE_EXE_LINKER_FLAGS="--coverage" \
+          -DJSRL_BUILD_TESTS=ON
+
+    - name: Build
+      run: cmake --build build -j
+
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure -j
+
+    - name: Generate coverage report
+      run: |
+        lcov --directory build --capture --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' '*/tests/*' '*/build/_deps/*' --output-file coverage.info
+        lcov --list coverage.info
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.info
+        fail_ci_if_error: false
+        verbose: true
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
