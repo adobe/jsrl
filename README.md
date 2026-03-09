@@ -1,5 +1,7 @@
 # JSRL - JSON Serialization and Reading Library
 
+[![CI](https://github.com/adobe/jsrl/actions/workflows/ci.yml/badge.svg)](https://github.com/adobe/jsrl/actions/workflows/ci.yml)
+
 A modern C++ JSON library designed around UTF-8 correctness, immutability, and high-fidelity number representation.
 
 ## Overview

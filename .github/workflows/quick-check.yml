@@ -1,0 +1,24 @@
+name: Quick Check
+
+on:
+  # Only run when manually triggered
+  workflow_dispatch:
+
+jobs:
+  quick-build:
+    name: Quick Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DJSRL_BUILD_TESTS=ON
+
+    - name: Build
+      run: cmake --build build -j
+
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure -j
