@@ -113,6 +113,21 @@ namespace std {
         }
     };
 
+    /*! @brief std::formatter specialization for jsrl::Json::ParseError
+     *
+     *  Formats Json parse error objects with their error tag, message, and
+     *  context (the JSON snippet that failed to parse).
+     */
+    template <>
+    struct formatter<jsrl::Json::ParseError> : formatter<string> {
+        template <typename _FormatContext>
+        auto format(jsrl::Json::ParseError const& val, _FormatContext& ctx) const {
+            std::ostringstream oss;
+            oss << val;
+            return formatter<string>::format(oss.str(), ctx);
+        }
+    };
+
     /*! @brief std::formatter specialization for jsrl::GeneralNumber
      *
      *  Formats GeneralNumber values using their operator<< implementation.

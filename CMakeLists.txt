@@ -47,10 +47,17 @@ set_target_properties(jsrl PROPERTIES
     VISIBILITY_INLINES_HIDDEN YES
 )
 
+# Generate export header for symbol visibility
+include(GenerateExportHeader)
+generate_export_header(jsrl
+    EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/jsrl_export.hpp
+)
+
 # Define headers for this library
 target_include_directories(jsrl
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<INSTALL_INTERFACE:include>
 )
 
@@ -83,9 +90,9 @@ if(JSRL_INSTALL)
         src/jsrl.hpp
         src/jsrl_format.hpp
         src/jsrl_general_number.hpp
-        src/jsrl_impl_util.hpp
         src/jsrl_mod.hpp
         src/jsrlpp.hpp
+        ${CMAKE_CURRENT_BINARY_DIR}/jsrl_export.hpp
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/jsrl
     )
 

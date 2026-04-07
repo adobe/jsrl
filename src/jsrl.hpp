@@ -12,6 +12,7 @@
 #ifndef JSRL_HPP_B29F03A37D5EAC6B156C3B92A05C1E4F
 #define JSRL_HPP_B29F03A37D5EAC6B156C3B92A05C1E4F
 
+#include "jsrl_export.hpp"
 #include "jsrl_general_number.hpp"
 
 #include <cstddef>
@@ -168,7 +169,7 @@ namespace jsrl {
      *  Unicode escape sequences on output
      *  (via surrogate pairs for non-BMP characters).
      */
-    struct Json {
+    struct JSRL_EXPORT Json {
         Json(Json const &) = default;
         Json &operator=(Json const &) = default;
         Json(Json &&) noexcept;
@@ -189,7 +190,7 @@ namespace jsrl {
         Json() noexcept;
         /*! @brief  Specialized overload of @c swap() for this type.
          */
-        friend void swap( Json &, Json & ) noexcept;
+        friend JSRL_EXPORT void swap( Json &, Json & ) noexcept;
 
         /*! @brief  Constructor for @b true / @b false JSON entities.
          */
@@ -877,7 +878,7 @@ namespace jsrl {
 
         /*! @brief  Encode the Json object as a string.
          */
-        friend
+        friend JSRL_EXPORT
         string encode( Json const &json );
 
         struct Error;
@@ -939,7 +940,7 @@ namespace jsrl {
 
     /*! @brief  Abstract base of JSON-related errors thrown by Json operations.
      */
-    struct Json::Error : ios_base::failure {
+    struct JSRL_EXPORT Json::Error : ios_base::failure {
         ~Error() noexcept override = 0;
 
         Json get_argument() const {
@@ -949,7 +950,7 @@ namespace jsrl {
             m_argument = std::move(argument);
         }
 
-        friend
+        friend JSRL_EXPORT
         ostream &operator<<( ostream &os, Error const &self );
     protected:
         Error( string const &msg );
@@ -960,7 +961,7 @@ namespace jsrl {
     };
     /*! @brief  Error thrown for an operation inappropriate for a type.
      */
-    struct Json::TypeError : Error {
+    struct JSRL_EXPORT Json::TypeError : Error {
         ~TypeError() noexcept override = 0;
 
         TypeError( string op, char const *actual_type );
@@ -972,21 +973,21 @@ namespace jsrl {
     };
     /*! @brief  Error thrown for a coercion operation on an incorrect type.
      */
-    struct Json::CastTypeError : TypeError {
+    struct JSRL_EXPORT Json::CastTypeError : TypeError {
         CastTypeError( string op, char const *actual_type )
             : TypeError( std::move(op), actual_type )
         { }
     };
     /*! @brief  Error thrown for an array/object operation on invalid type.
      */
-    struct Json::CompoundTypeError : TypeError {
+    struct JSRL_EXPORT Json::CompoundTypeError : TypeError {
         CompoundTypeError( string op, char const *actual_type )
             : TypeError( std::move(op), actual_type )
         { }
     };
     /*! @brief  Error thrown for a misuse of operator[].
      */
-    struct Json::KeyError : Error {
+    struct JSRL_EXPORT Json::KeyError : Error {
         ~KeyError() noexcept override = 0;
     protected:
         KeyError( string const &msg );
@@ -994,17 +995,17 @@ namespace jsrl {
     };
     /*! @brief  Error thrown for an out-of-bounds array index.
      */
-    struct Json::ArrayKeyError : KeyError {
+    struct JSRL_EXPORT Json::ArrayKeyError : KeyError {
         ArrayKeyError( size_t key, size_t size );
     };
     /*! @brief  Error thrown for accessing an unset key in an object.
      */
-    struct Json::ObjectKeyError : KeyError {
+    struct JSRL_EXPORT Json::ObjectKeyError : KeyError {
         ObjectKeyError( string key );
     };
     /*! @brief  Error thrown for bad JSON during parsing.
      */
-    struct Json::ParseError : Error {
+    struct JSRL_EXPORT Json::ParseError : Error {
         ~ParseError() noexcept override = 0;
         ParseError( string const &message );
 
@@ -1019,28 +1020,28 @@ namespace jsrl {
     };
     /*! @brief  Specific error for a number parse failure.
      */
-    struct Json::NumberParseError : ParseError {
+    struct JSRL_EXPORT Json::NumberParseError : ParseError {
         NumberParseError( string const &message );
     };
     /*! @brief  Specific error for a parse failure from bad Unicode.
      */
-    struct Json::UTFParseError : ParseError {
+    struct JSRL_EXPORT Json::UTFParseError : ParseError {
         UTFParseError( string const &message );
     };
     /*! @brief  Specific error for end-of-file.
      */
-    struct Json::EOFParseError : ParseError {
+    struct JSRL_EXPORT Json::EOFParseError : ParseError {
         ~EOFParseError() noexcept override = 0;
         EOFParseError( string const &message );
     };
     /*! @brief  Specific error for end-of-file at input start.
      */
-    struct Json::StartEOFParseError : EOFParseError {
+    struct JSRL_EXPORT Json::StartEOFParseError : EOFParseError {
         StartEOFParseError( string const &message );
     };
     /*! @brief  Specific error for unexpected end-of-file.
      */
-    struct Json::BadEOFParseError : EOFParseError {
+    struct JSRL_EXPORT Json::BadEOFParseError : EOFParseError {
         BadEOFParseError( string const &message );
         BadEOFParseError( StartEOFParseError const &err )
             : EOFParseError( err )
@@ -1048,12 +1049,12 @@ namespace jsrl {
     };
     /*! @brief  Specific error for trailing comma, parsing an array or object.
      */
-    struct Json::TrailingCommaParseError : ParseError {
+    struct JSRL_EXPORT Json::TrailingCommaParseError : ParseError {
         TrailingCommaParseError( string const &container_type );
     };
     /*! @brief  Error for unexpected bytes while reading a JSON entity.
      */
-    struct Json::UnexpectedByteParseError : ParseError {
+    struct JSRL_EXPORT Json::UnexpectedByteParseError : ParseError {
         UnexpectedByteParseError( string const &message, char got )
             : ParseError( message )
             , m_got( got )
@@ -1066,14 +1067,14 @@ namespace jsrl {
     };
     /*! @brief  Error for bytes after reading a JSON from a bounded input range.
      */
-    struct Json::TrailingBytesParseError : ParseError {
+    struct JSRL_EXPORT Json::TrailingBytesParseError : ParseError {
         TrailingBytesParseError( )
             : ParseError( "Trailing bytes" )
         { }
     };
     /*! @brief  Error thrown for bad JSON during output encoding.
      */
-    struct Json::EncodeError : Error {
+    struct JSRL_EXPORT Json::EncodeError : Error {
         ~EncodeError() noexcept override = 0;
         EncodeError( string const &message );
     protected:
@@ -1081,12 +1082,12 @@ namespace jsrl {
     };
     /*! @brief  Error thrown for bad UTF-8 bytes during output encoding.
      */
-    struct Json::EncodeByteError : EncodeError {
+    struct JSRL_EXPORT Json::EncodeByteError : EncodeError {
         EncodeByteError( string const &message );
     };
     /*! @brief  Error thrown for bad Unicode codepoint during output encoding.
      */
-    struct Json::EncodeCodepointError : EncodeError {
+    struct JSRL_EXPORT Json::EncodeCodepointError : EncodeError {
         EncodeCodepointError( string const &message );
     };
 
@@ -1186,7 +1187,7 @@ namespace jsrl {
      *                  If @c ( e == nullptr ) (or not given),
      *                  @c b is taken as a null-terminated string.
      */
-    void validate_utf8( char const *b, char const *e = nullptr );
+    JSRL_EXPORT void validate_utf8( char const *b, char const *e = nullptr );
 
     /*! @overload
      *  @brief  Validate a string as valid UTF-8.
@@ -1206,9 +1207,9 @@ namespace jsrl {
         self.emplace_back( std::move( key ), std::move( value ) );
     }
 
-    void resort( Json::ObjectBody &body );
+    JSRL_EXPORT void resort( Json::ObjectBody &body );
 
-    Json::ObjectBody::const_iterator find(
+    JSRL_EXPORT Json::ObjectBody::const_iterator find(
             Json::ObjectBody const &self,
             std::string_view key
             );

@@ -127,6 +127,14 @@ cmake --build . -j
 ctest --output-on-failure
 ```
 
+To build as a shared library instead:
+
+```bash
+cmake -DBUILD_SHARED_LIBS=ON ..
+cmake --build . -j
+ctest --output-on-failure
+```
+
 ### Installation
 
 To install JSRL system-wide:
