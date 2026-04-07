@@ -12,6 +12,7 @@
 #ifndef JSRLPP_HPP_4F27FB97E4CD09CA66B36CB4C0C47649
 #define JSRLPP_HPP_4F27FB97E4CD09CA66B36CB4C0C47649
 
+#include "jsrl_export.hpp"
 #include "jsrl.hpp"
 #include <functional>
 #include <cassert>
@@ -31,7 +32,7 @@ namespace jsrl {
 
     struct BoundJsonPrettyPrint;
 
-    struct JsonPrettyPrintConfig {
+    struct JSRL_EXPORT JsonPrettyPrintConfig {
         using KeyOrderer = function<vector<string>(Json::ObjectBody const &)>;
 
         JsonPrettyPrintConfig()

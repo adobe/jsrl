@@ -12,6 +12,7 @@
 #ifndef JSRL_GENERAL_NUMBER_HPP_1C7F88DD1C404E06622C0EBE5B84ABE8
 #define JSRL_GENERAL_NUMBER_HPP_1C7F88DD1C404E06622C0EBE5B84ABE8
 
+#include "jsrl_export.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <iosfwd>
@@ -75,7 +76,7 @@ namespace jsrl {
     };
     /*! @brief  Character-based type for high-fidelity float round-tripping.
      */
-    struct GeneralNumber : private GeneralNumberData {
+    struct JSRL_EXPORT GeneralNumber : private GeneralNumberData {
 
         /*! @brief  Default constructor. */
         GeneralNumber() = default;
@@ -138,15 +139,15 @@ namespace jsrl {
         bool is_long_long() const;          /*!< @brief Fits in int? */
 
         /*! @brief  Stream insertion. */
-        friend
+        friend JSRL_EXPORT
         istream &operator>>( istream &istr, GeneralNumber &self );
 
         /*! @brief  Stream extraction. */
-        friend
+        friend JSRL_EXPORT
         ostream &operator<<( ostream &ostr, GeneralNumber const &self );
 
         /*! @brief  Three-way comparison (used in tricchotomy operators). */
-        friend
+        friend JSRL_EXPORT
         int cmp3way( GeneralNumber const &lhs, GeneralNumber const &rhs );
 #define CMPOP( OP ) \
         friend \

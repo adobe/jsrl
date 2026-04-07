@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shared: [ON, OFF]
+
+    name: Linux (${{ matrix.shared == 'ON' && 'shared' || 'static' }})
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: >
+          cmake -B build -S .
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_SHARED_LIBS=${{ matrix.shared }}
+          -DJSRL_BUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Check exported symbols
+        if: matrix.shared == 'ON'
+        run: |
+          echo "=== Dynamic symbol table ==="
+          nm -D --demangle build/libjsrl.so | grep 'jsrl::'
+          echo "=== Verifying key symbols are present ==="
+          nm -D --demangle build/libjsrl.so | grep -q 'jsrl::Json::parse'
+          nm -D --demangle build/libjsrl.so | grep -q 'jsrl::GeneralNumber::parse'
+          nm -D --demangle build/libjsrl.so | grep -q 'jsrl::Json::Error'
+          echo "All expected symbols found."
