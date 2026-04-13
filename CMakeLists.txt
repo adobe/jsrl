@@ -53,6 +53,12 @@ generate_export_header(jsrl
     EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/jsrl_export.hpp
 )
 
+# Static library consumers must define JSRL_STATIC_DEFINE so the export
+# header suppresses __declspec(dllimport) / visibility("default") attributes.
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(jsrl PUBLIC JSRL_STATIC_DEFINE)
+endif()
+
 # Define headers for this library
 target_include_directories(jsrl
     PUBLIC
