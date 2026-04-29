@@ -125,7 +125,7 @@ namespace jsrl {
                 need_digit = "No digits after decimal";
                 continue;
             default:
-                if ( not isdigit( byte ) )
+                if ( !isdigit( byte ) )
                     break;
                 need_digit = nullptr;
                 switch ( exponentseen ) {

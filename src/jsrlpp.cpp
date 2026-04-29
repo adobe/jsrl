@@ -100,7 +100,7 @@ namespace jsrl {
                         // and that the key hasn't already been printed.
                         // Then print the found element.
                         if ( found != end( object )
-                                and printed.insert( key ).second )
+                                && printed.insert( key ).second )
                             p_print_key( os, *found, new_linesep, first );
                     }
                 }
