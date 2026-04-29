@@ -60,11 +60,11 @@ namespace jsrl {
 
     void Json::Error::v_print( ostream &os ) const {
         os << what();
-        if ( os and not m_argument.is_null() ) {
+        if ( os && !m_argument.is_null() ) {
             os << " on ";
             try {
                 os << m_argument;
-                if ( not os ) {
+                if ( !os ) {
                     throw EncodeByteError(
                             "Jump into catch block if the write failed." );
                 }
@@ -671,12 +671,12 @@ namespace jsrl {
                     throw Json::EncodeByteError(
                             "String ends in the middle of a UTF-8 sequence" );
                 uint8_t const byte = *cur;
-                if ( not byte_is_utf8_continuation(byte) )
+                if ( !byte_is_utf8_continuation(byte) )
                     throw Json::EncodeByteError(
                             "Continuation byte missing in UTF-8 sequence" );
                 ++cur;
                 primer <<= 6;
-                primer or_eq byte & 0x3F;
+                primer |= byte & 0x3F;
             }
             return primer;
         }
@@ -726,7 +726,7 @@ namespace jsrl {
             } catch ( Json::EncodeByteError const & ) {
                 if ( fail_bad_utf8 )
                     throw;
-                while ( cur != end and byte_is_utf8_continuation( *cur ) )
+                while ( cur != end && byte_is_utf8_continuation( *cur ) )
                     ++cur;
                 return 0xFFFD;
             } catch ( Json::EncodeCodepointError const & ) {
@@ -801,7 +801,7 @@ namespace jsrl {
         }
     }
     void validate_utf8( char const *c, char const *const e ) {
-        bool const nullterminated = not e;
+        bool const nullterminated = !e;
         while ( nullterminated ? *c : c != e )
             scan_valid_utf8_codepoint( c, e );
     }
@@ -976,7 +976,7 @@ namespace jsrl {
         struct CmpNot : private Cmp {
             template<typename P1, typename P2>
             bool operator()( P1 const &p1, P2 const &p2 ) {
-                return not Cmp::operator()( p1, p2 );
+                return !Cmp::operator()( p1, p2 );
             }
         };
         template<typename Comp, typename Iter>
@@ -987,7 +987,7 @@ namespace jsrl {
     }
     void resort( Json::ObjectBody &body ) {
         Json::ObjectBody::iterator mbegin = body.begin(), mend = body.end();
-        if ( not is_strictly_ascending<CmpLt>(mbegin, mend) ) {
+        if ( !is_strictly_ascending<CmpLt>(mbegin, mend) ) {
             reverse( mbegin, mend );
             stable_sort( mbegin, mend, CmpLt() );
             body.erase( unique( mbegin, mend, CmpEq() ), mend );
@@ -1244,7 +1244,7 @@ namespace jsrl {
     Json const &Json::operator[](std::string_view key) const {
         try {
             Json const *element = m_el->find_key( key );
-            if ( not element )
+            if ( !element )
                 throw Json::ObjectKeyError( string(key) );
             return *element;
         } catch ( TypeError const &e ) {
@@ -1349,7 +1349,7 @@ namespace jsrl {
 
     void Json::ParseError::v_print( ostream &os ) const {
         Error::v_print( os );
-        if ( not m_context.empty() )
+        if ( !m_context.empty() )
             write_JSON_string( os << " before ", m_context );
     }
     void Json::ParseError::add_context( streambuf &sbuf, size_t max_bytes ) {
@@ -1652,7 +1652,7 @@ namespace jsrl {
                 s_begin = self.begin(),
                 s_end = self.end();
         const_iterator found = lower_bound( s_begin, s_end, key, CmpLt() );
-        if ( found == s_end or found->first != key )
+        if ( found == s_end || found->first != key )
             return s_end;
         return found;
     }

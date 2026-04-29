@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14...3.27)
 
 project(jsrl
-    VERSION 1.0.0
+    VERSION 1.0.4
     DESCRIPTION "JSON Serialization and Reading Library - A modern C++ JSON library"
     LANGUAGES CXX
 )

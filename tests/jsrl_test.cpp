@@ -91,47 +91,47 @@ namespace {
     }
     auto isnt_null( Json const &json ) -> bool
     {
-        return not is_null(json);
+        return !is_null(json);
     }
     auto isnt_bool( Json const &json ) -> bool
     {
-        return not is_bool(json);
+        return !is_bool(json);
     }
     auto isnt_number( Json const &json ) -> bool
     {
-        return not is_number(json);
+        return !is_number(json);
     }
     auto isnt_number_general( Json const &json ) -> bool
     {
-        return not is_number_general(json);
+        return !is_number_general(json);
     }
     auto isnt_number_float( Json const &json ) -> bool
     {
-        return not is_number_float(json);
+        return !is_number_float(json);
     }
     auto isnt_number_integer( Json const &json ) -> bool
     {
-        return not is_number_integer(json);
+        return !is_number_integer(json);
     }
     auto isnt_number_sint( Json const &json ) -> bool
     {
-        return not is_number_sint(json);
+        return !is_number_sint(json);
     }
     auto isnt_number_uint( Json const &json ) -> bool
     {
-        return not is_number_uint(json);
+        return !is_number_uint(json);
     }
     auto isnt_string( Json const &json ) -> bool
     {
-        return not is_string(json);
+        return !is_string(json);
     }
     auto isnt_array( Json const &json ) -> bool
     {
-        return not is_array(json);
+        return !is_array(json);
     }
     auto isnt_object( Json const &json ) -> bool
     {
-        return not is_object(json);
+        return !is_object(json);
     }
 
     auto has_key( Json const &json, string const &key ) -> bool
@@ -140,7 +140,7 @@ namespace {
     }
     auto doesnt_have_key( Json const &json, string const &key ) -> bool
     {
-        return not has_key( json, key );
+        return !has_key( json, key );
     }
 }
 
@@ -728,7 +728,7 @@ TEST( Jsrl,GetAs ) {
         if ( i>=7 ) {
             EXPECT_DOUBLE_EQ( 0.0, json_array.get_number_float(i,0.0) );
             EXPECT_DOUBLE_EQ( 1.0, json_array.get_number_float(i,1.0) );
-        } else if ( i>=2 and i<=3 ) {
+        } else if ( i>=2 && i<=3 ) {
             EXPECT_DOUBLE_EQ( 0.0, json_array.get_number_float(i,0.0) );
             EXPECT_DOUBLE_EQ( 0.0, json_array.get_number_float(i,1.0) );
         } else {
@@ -1019,7 +1019,7 @@ TEST( Jsrl,EOFParse ) {
                     R"JSON({ "" : "" })JSON",
                     "",
                 } ) {
-            if ( not *data and *precursor )
+            if ( !*data && *precursor )
                 continue;
             for ( auto &&trailer : { "  ", "" } ) {
                 [&]{
@@ -1609,7 +1609,7 @@ struct ComparatorTester {
             auto inserted = m_values.insert(
                     make_pair(new_value,vector<pair<Json,unsigned> >{
                         make_pair(new_value,lineno) } ) );
-            if ( not inserted.second ) {
+            if ( !inserted.second ) {
                 FAIL() << "Value at line " << lineno
                         << " is already inserted\nValue "
                         << new_value ;

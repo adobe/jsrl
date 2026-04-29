@@ -31,11 +31,11 @@ namespace jsrl {
             int byte = sbuf.sbumpc();
             if ( byte == EOF )
                 throw BadEOFParseError( "Input ended in unicode escape" );
-            if ( byte >= '0' and byte <= '9' )
+            if ( byte >= '0' && byte <= '9' )
                 return byte - '0';
-            if ( byte >= 'a' and byte <= 'f' )
+            if ( byte >= 'a' && byte <= 'f' )
                 return byte - 'a' + 10;
-            if ( byte >= 'A' and byte <= 'F' )
+            if ( byte >= 'A' && byte <= 'F' )
                 return byte - 'A' + 10;
             sbuf.sungetc();
             throw UnexpectedByteParseError(
@@ -45,7 +45,7 @@ namespace jsrl {
             uint16_t codepoint = 0;
             for ( unsigned n = 4; n--; ) {
                 codepoint <<= 4;
-                codepoint or_eq read_hex_digit( sbuf );
+                codepoint |= read_hex_digit( sbuf );
             }
             return codepoint;
         }
@@ -83,9 +83,9 @@ namespace jsrl {
                 if ( ( second_surrogate & ~0x3FF ) != 0xDC00 ) {
                     throw UTFParseError("bad second half of surrogate");
                 }
-                codepoint and_eq 0x03FF;
+                codepoint &= 0x03FF;
                 codepoint <<= 10;
-                codepoint or_eq (second_surrogate & 0x03FF);
+                codepoint |= (second_surrogate & 0x03FF);
                 codepoint += 0x00010000;
             } else if ( ( codepoint & ~0x3FF ) == 0xDC00 ) {
                 throw UTFParseError("orphaned second half of surrogate");
@@ -175,7 +175,7 @@ namespace jsrl {
                     if ( byte == EOF )
                         throw BadEOFParseError( "Incomplete block-comment"
                                 " at end of input" );
-                    if ( byte == '/' and lastbyte == '*' )
+                    if ( byte == '/' && lastbyte == '*' )
                         break;
                 }
                 continue;

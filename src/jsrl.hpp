@@ -1128,7 +1128,7 @@ namespace jsrl {
     template<typename K>                                                    \
     CPPT Json::get_##TYPE(K &&key, CPPT default_value) const {             \
         Json const *element = find_key( std::forward<K>(key) );             \
-        if ( not element )                                                  \
+        if ( !element )                                                     \
             return default_value;                                           \
         return element->as_##TYPE();                                        \
     }
@@ -1158,7 +1158,7 @@ namespace jsrl {
     Json const &Json::operator[]( size_t index ) const {
         try {
             Json const *element = find_key( index );
-            if ( not element )
+            if ( !element )
                 throw Json::ArrayKeyError( index, size() );
             return *element;
         } catch ( TypeError const &e ) {
@@ -1169,7 +1169,7 @@ namespace jsrl {
     template<typename K, typename D>
     Json Json::get( K &&key, D &&default_val ) const {
         Json const *element = find_key( std::forward<K>(key) );
-        if ( not element )
+        if ( !element )
             return Json( std::forward<D>(default_val) );
         return *element;
     }
